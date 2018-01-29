@@ -1,0 +1,3 @@
+*.o
+test_lock_based
+lock_based
