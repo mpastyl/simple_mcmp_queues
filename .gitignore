@@ -1,3 +1,5 @@
 *.o
 test_lock_based
+test_lock_free
 lock_based
+lock_free
