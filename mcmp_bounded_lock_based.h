@@ -17,7 +17,7 @@
 void init_queue(uint32_t size);
 int enqueue(uint32_t data);
 int dequeue(uint32_t *data);
-
+void print_size();
 
 // Barriers
 #  define COMPILER_BARRIER() asm volatile ("" ::: "memory")
