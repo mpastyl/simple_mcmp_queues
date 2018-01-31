@@ -28,6 +28,7 @@ void init_queue(uint32_t size){
 	
 	buffer.N = size;
 	buffer.head = size/2; //populate half the queue
+	//buffer.head = 0; //populate half the queue
 	buffer.tail = 0;
 	buffer.mask = buffer.N-1;
 	assert((buffer.N & buffer.mask)==0 && "Size of buffer was not a power of 2");
@@ -46,9 +47,10 @@ void print_size(){
 
 int enqueue(uint32_t data){
 		
-	uint32_t cp_head = buffer.head;
+	volatile uint32_t cp_head = buffer.head;
 	uint32_t diff  = cp_head - buffer.tail;
 	while (diff<buffer.N){
+		if (buffer.array[cp_head & buffer.mask].used_slot == 1) return 1; //the dequeuer has not actually dequeued yet
 		if( __sync_val_compare_and_swap( &(buffer.head), cp_head, cp_head+1) == cp_head){
 			// I managed to get a slot. Now i have to put data and return success
 			buffer.array[cp_head & buffer.mask].value = data;
@@ -65,13 +67,16 @@ int enqueue(uint32_t data){
 int dequeue(uint32_t * data){
 
 	uint32_t ret;
-	uint32_t cp_tail = buffer.tail;
+	volatile uint32_t cp_tail = buffer.tail;
 	uint32_t diff = buffer.head - cp_tail;
 	while (diff>0){
 		if( __sync_val_compare_and_swap( &(buffer.tail), cp_tail, cp_tail+1) == cp_tail){
 			// I managed to get a slot. I might need to check in case the enqueuer didn't put data inside yet.
-			while (!(buffer.array[cp_tail & buffer.mask].used_slot)){}
+			while (!(buffer.array[cp_tail & buffer.mask].used_slot)){
+				//printf("Stalling on cp_tail %d while there are %d elements \n",cp_tail, buffer.head-buffer.tail);
+			}
 			ret = buffer.array[cp_tail & buffer.mask].value;
+			buffer.array[cp_tail & buffer.mask].value = 42;
 			*data=ret;
 			buffer.array[cp_tail & buffer.mask].used_slot = 0;
 			return 0;

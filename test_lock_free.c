@@ -50,22 +50,22 @@ void thread_loop(void * tid_void_ptr){
 	int tot_ops=0;
 	while (!stop){
 		int ret;
-		//FIXME
 		uint64_t r = (my_random(&(seeds[0]), &(seeds[1]), &(seeds[2])) % (100000 + 1)) + 0;		
-		//busy_loop(1);	 
+		//busy_loop(1);	
 	
 		tot_ops++;
 		if (r %2){ //enqueue
 			ret = enqueue((uint32_t)r);
-			if(!ret) succ_enq++;
+			//if(!ret) succ_enq++;
+			succ_enq++;
 		}
 		else{//dequeue
 			uint32_t data =0;
 			ret = dequeue(&data);
 			if (!ret){
 				data_dump |= data;
-				succ_deq++;
 			}
+			succ_deq++;
 		}
 	}
 	gettimeofday(&my_data->end, NULL);
@@ -73,7 +73,6 @@ void thread_loop(void * tid_void_ptr){
 	my_data->succ_deq =  succ_deq;
 	my_data->tot_ops = tot_ops;
 	my_data->data_dump = data_dump;
-	printf("Thread %d exiting \n",tid);
 }
 
 int main(int argc, char * argv[]){
@@ -160,7 +159,7 @@ int main(int argc, char * argv[]){
 	printf("data dump: %d \n",data_dump);
 	printf("Total %ld operations, succesful %ld \n",total_ops, total_succ_ops);
 	double throughput = total_succ_ops / (float)bench_duration_sec;
-	printf("THROUGHPUT(lock_free): %f MOps per second \n",throughput/1e6);
+	printf("THROUGHPUT: %f MOps per second \n",throughput/1e6);
 	print_size();
     return 1;
 }

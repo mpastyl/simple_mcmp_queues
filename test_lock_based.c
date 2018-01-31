@@ -56,15 +56,16 @@ void thread_loop(void * tid_void_ptr){
 		tot_ops++;
 		if (r %2){ //enqueue
 			ret = enqueue((uint32_t)r);
-			if(!ret) succ_enq++;
+			//if(!ret) succ_enq++;
+			succ_enq++;
 		}
 		else{//dequeue
 			uint32_t data =0;
 			ret = dequeue(&data);
 			if (!ret){
 				data_dump |= data;
-				succ_deq++;
 			}
+			succ_deq++;
 		}
 	}
 	gettimeofday(&my_data->end, NULL);
