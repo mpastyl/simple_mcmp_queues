@@ -50,9 +50,10 @@ int enqueue(uint32_t data){
 	volatile uint32_t cp_head = buffer.head;
 	uint32_t diff  = cp_head - buffer.tail;
 	while (diff<buffer.N){
-		if (buffer.array[cp_head & buffer.mask].used_slot == 1) return 1; //the dequeuer has not actually dequeued yet
+		//if (buffer.array[cp_head & buffer.mask].used_slot == 1) return 1; //the dequeuer has not actually dequeued yet
 		if( __sync_val_compare_and_swap( &(buffer.head), cp_head, cp_head+1) == cp_head){
 			// I managed to get a slot. Now i have to put data and return success
+			while (buffer.array[cp_head & buffer.mask].used_slot == 1) {}; //the dequeuer has not actually dequeued yet
 			buffer.array[cp_head & buffer.mask].value = data;
 			buffer.array[cp_head & buffer.mask].used_slot = 1;
 			return 0;//0 means success

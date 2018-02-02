@@ -13,7 +13,7 @@
 uint32_t no_threads;
 uint32_t size = 1024*16;
 int bench_duration_sec;
-int work=10000;
+int work;
 //
 
 //globals
@@ -51,7 +51,7 @@ void thread_loop(void * tid_void_ptr){
 	while (!stop){
 		int ret;
 		uint64_t r = (my_random(&(seeds[0]), &(seeds[1]), &(seeds[2])) % (100000 + 1)) + 0;		
-		//busy_loop(1);	
+		busy_loop(work);	
 	
 		tot_ops++;
 		if (r %2){ //enqueue
@@ -77,14 +77,15 @@ void thread_loop(void * tid_void_ptr){
 
 int main(int argc, char * argv[]){
 
-	setaffinity_oncpu(13);
-	if (argc!=3){
-		printf("Usage: executable number_of_threads benchmark_duration\n");	
+	//setaffinity_oncpu(13);
+	if (argc!=4){
+		printf("Usage: executable number_of_threads benchmark_duration work_between_operations\n");	
 		return 0;
 	}
 
 	no_threads = atoi(argv[1]);
 	bench_duration_sec = atoi(argv[2]);
+	work = atoi(argv[3])+1;	
 
 	printf("Starting lock based benchmark with %d threads, for %d seconds\n",no_threads,bench_duration_sec);
 
