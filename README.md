@@ -2,7 +2,11 @@
 
 A couple of simple lock-free and lock based, multi-consumer-multi-producer queue implementations.
 
+```
+cd simple_mcpmp_queues
 make 
+```
 
-use test_lock_based or test_lock_free
+use `test_lock_based` or `test_lock_free`
+
 Usage: executable number_of_threads benchmark_duration work_between_operations
